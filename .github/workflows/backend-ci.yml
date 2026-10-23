@@ -18,9 +18,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: 123
-          POSTGRES_DB: school-test
+          POSTGRES_USER: onlystudent
+          POSTGRES_PASSWORD: onlystudent
+          POSTGRES_DB: onlystudent-test
         ports:
           - 5432:5432
         options: >-
@@ -42,9 +42,7 @@ jobs:
 
       - name: Run Tests
         env:
-          # Variáveis em MINÚSCULO para bater com o application.properties principal
-          jwt_secret: "chave-de-teste-super-segura-para-ci-123456"
-          db_username: root
-          db_password: 123
-          db_url: jdbc:postgresql://localhost:5432/school-test
+          TEST_DB_URL: jdbc:postgresql://localhost:5432/onlystudent-test
+          TEST_DB_USERNAME: onlystudent
+          TEST_DB_PASSWORD: onlystudent
         run: ./mvnw clean test
