@@ -100,8 +100,12 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.DELETE, "/turma/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.POST, "/material/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.DELETE, "/material/**").hasRole("EDUCATOR")
+                        .requestMatchers(HttpMethod.GET, "/material/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.POST, "/support/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/token/**").permitAll()
+                        // Actuator — health check público para o Render
+                        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(rateLimitFilter(), SecurityContextHolderFilter.class)
