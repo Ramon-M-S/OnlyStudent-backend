@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase;
+import com.sloth.OnlyStudent.application.classroom.CancelClassroomDeletionUseCase;
 import com.sloth.OnlyStudent.application.classroom.CreateClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.GetClassroomDetailsUseCase;
 import com.sloth.OnlyStudent.application.classroom.JoinClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase;
+import com.sloth.OnlyStudent.application.classroom.ScheduleClassroomDeletionUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListEducatorClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListStudentClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.SearchClassroomsUseCase;
@@ -68,8 +72,11 @@ public class ClassroomController {
     private final ListMaterialsUseCase listMaterialsUseCase;
     private final CreateAvisoUseCase createAvisoUseCase;
     private final UpdateClassroomUseCase updateClassroomUseCase;
+    private final ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase;
+    private final CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase;
 
     // CORREÇÃO AQUI: Adicionado o CreateAvisoUseCase no construtor
+    @Autowired
     public ClassroomController(ClassroomRepository classroomRepository,
             MaterialRepository materialRepository,
             ClassroomService classroomService,
@@ -81,7 +88,9 @@ public class ClassroomController {
             SearchClassroomsUseCase searchClassroomsUseCase,
             ListMaterialsUseCase listMaterialsUseCase,
             CreateAvisoUseCase createAvisoUseCase,
-            UpdateClassroomUseCase updateClassroomUseCase) {
+            UpdateClassroomUseCase updateClassroomUseCase,
+            ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase,
+            CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase) {
         this.classroomRepository = classroomRepository;
         this.materialRepository = materialRepository;
         this.classroomService = classroomService;
@@ -94,6 +103,27 @@ public class ClassroomController {
         this.listMaterialsUseCase = listMaterialsUseCase;
         this.createAvisoUseCase = createAvisoUseCase;
         this.updateClassroomUseCase = updateClassroomUseCase;
+        this.scheduleClassroomDeletionUseCase = scheduleClassroomDeletionUseCase;
+        this.cancelClassroomDeletionUseCase = cancelClassroomDeletionUseCase;
+    }
+
+    public ClassroomController(ClassroomRepository classroomRepository,
+            MaterialRepository materialRepository,
+            ClassroomService classroomService,
+            CreateClassroomUseCase createClassroomUseCase,
+            JoinClassroomUseCase joinClassroomUseCase,
+            ListStudentClassroomsUseCase listStudentClassroomsUseCase,
+            ListEducatorClassroomsUseCase listEducatorClassroomsUseCase,
+            GetClassroomDetailsUseCase getClassroomDetailsUseCase,
+            SearchClassroomsUseCase searchClassroomsUseCase,
+            ListMaterialsUseCase listMaterialsUseCase,
+            CreateAvisoUseCase createAvisoUseCase,
+            UpdateClassroomUseCase updateClassroomUseCase) {
+        this(classroomRepository, materialRepository, classroomService, createClassroomUseCase, joinClassroomUseCase,
+                listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
+                searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, updateClassroomUseCase,
+                new ScheduleClassroomDeletionUseCase(classroomRepository),
+                new CancelClassroomDeletionUseCase(classroomRepository));
     }
 
     @GetMapping
@@ -172,16 +202,21 @@ public class ClassroomController {
                                 aviso.getId(),
                                 aviso.getMensagem(),
                                 aviso.getDataCriacao()))
-                        .toList()));
+                        .toList(),
+                updated.getDataExclusaoAgendada()));
     }
 
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deleteClassroom(@PathVariable Long codigo,
             @AuthenticationPrincipal User principal) {
-        Classroom classroom = classroomRepository.findByCodigo(codigo)
-                .orElseThrow(ClassroomNotFoundException::new);
-        requireEducatorOwner(classroom, principal);
-        classroomRepository.delete(classroom);
+        scheduleClassroomDeletionUseCase.execute(codigo, principal);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{codigo}/cancelar-exclusao")
+    public ResponseEntity<Void> cancelClassroomDeletion(@PathVariable Long codigo,
+            @AuthenticationPrincipal User principal) {
+        cancelClassroomDeletionUseCase.execute(codigo, principal);
         return ResponseEntity.noContent().build();
     }
 
