@@ -10,7 +10,6 @@ import com.sloth.OnlyStudent.entities.DTO.ClassroomDTO;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
 import com.sloth.OnlyStudent.repository.EducatorRepository;
 import com.sloth.OnlyStudent.shared.errors.ClassroomAccessDeniedException;
-import com.sloth.OnlyStudent.shared.errors.ClassroomNameAlreadyExistsException;
 import com.sloth.OnlyStudent.shared.errors.EducatorNotFoundException;
 
 @Service
@@ -28,9 +27,6 @@ public class CreateClassroomUseCase {
     public Classroom execute(ClassroomDTO request, Long principalId, UserRole principalRole) {
         if (principalRole != UserRole.EDUCATOR) {
             throw new ClassroomAccessDeniedException();
-        }
-        if (classroomRepository.existsByName(request.name())) {
-            throw new ClassroomNameAlreadyExistsException();
         }
         Educator educator = educatorRepository.findById(principalId)
                 .orElseThrow(EducatorNotFoundException::new);

@@ -235,7 +235,7 @@ class ApiContractCharacterizationTest {
 
     @Test
     void classroomDetailsKeepsDirectJsonShapeIncludingCodigo() throws Exception {
-        ClassroomDetailsDTO details = new ClassroomDetailsDTO(12L, "Algebra", "Aula", "Edu", Set.of(), List.of("Ana"), List.of());
+        ClassroomDetailsDTO details = new ClassroomDetailsDTO(12L, "Algebra", "Aula", "Edu", 7L, Set.of(), List.of("Ana"), List.of());
         when(getClassroomDetailsUseCase.execute(eq(12L), any())).thenReturn(details);
         mockMvc.perform(get("/turma/12"))
                 .andExpect(status().isOk())
@@ -243,6 +243,7 @@ class ApiContractCharacterizationTest {
                 .andExpect(jsonPath("$.name").value("Algebra"))
                 .andExpect(jsonPath("$.description").value("Aula"))
                 .andExpect(jsonPath("$.educator").value("Edu"))
+                .andExpect(jsonPath("$.idEducator").value(7))
                 .andExpect(jsonPath("$.nomeAlunos[0]").value("Ana"))
                 .andExpect(jsonPath("$.materiais").isArray());
     }

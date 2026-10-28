@@ -155,6 +155,7 @@ public class ClassroomController {
                 updated.getName(),
                 updated.getDescription(),
                 updated.getEducator() != null ? updated.getEducator().getName() : null,
+                updated.getEducator() != null ? updated.getEducator().getId() : null,
                 updated.getMaterials() == null ? Set.of() : updated.getMaterials().stream()
                         .map(material -> new com.sloth.OnlyStudent.entities.DTO.MaterialResponseDTO(
                                 material.getId(),

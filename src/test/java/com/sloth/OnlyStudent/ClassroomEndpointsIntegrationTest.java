@@ -89,16 +89,15 @@ class ClassroomEndpointsIntegrationTest {
     }
 
     @Test
-    void duplicateClassroomNameReturnsConflictAsPlainText() throws Exception {
+    void educatorsCanCreateClassroomsWithDuplicateNames() throws Exception {
         classroomRepository.save(classroom("Álgebra", owner));
 
         mockMvc.perform(post("/turma/register")
-                        .with(as(owner))
+                        .with(as(otherEducator))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(classroomRequest("Álgebra", 0, owner.getId())))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-                .andExpect(content().string("Já existe uma turma com esse nome."));
+                        .content(classroomRequest("Álgebra", 0, otherEducator.getId())))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Turma criada com sucesso!"));
     }
 
     @Test

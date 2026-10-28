@@ -10,7 +10,6 @@ import com.sloth.OnlyStudent.entities.UserRole;
 import com.sloth.OnlyStudent.entities.DTO.ClassroomDTO;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
 import com.sloth.OnlyStudent.shared.errors.ClassroomAccessDeniedException;
-import com.sloth.OnlyStudent.shared.errors.ClassroomNameAlreadyExistsException;
 import com.sloth.OnlyStudent.shared.errors.ClassroomNotFoundException;
 import com.sloth.OnlyStudent.shared.errors.InvalidClassroomException;
 
@@ -42,12 +41,6 @@ public class UpdateClassroomUseCase {
         if (newName.length() > 100) {
             throw new InvalidClassroomException("O nome da turma deve ter no máximo 100 caracteres.");
         }
-
-        classroomRepository.findByName(newName)
-                .filter(existing -> !Objects.equals(existing.getCodigo(), classroomId))
-                .ifPresent(existing -> {
-                    throw new ClassroomNameAlreadyExistsException();
-                });
 
         classroom.setName(newName);
         classroom.setDescription(request.description());

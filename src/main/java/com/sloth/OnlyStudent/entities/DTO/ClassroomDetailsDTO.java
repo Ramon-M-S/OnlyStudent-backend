@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Set;
 
 public record ClassroomDetailsDTO(
-    Long codigo, 
-    String name, 
-    String description, 
-    String educator, 
-    Set<MaterialResponseDTO> materiais, 
+    Long codigo,
+    String name,
+    String description,
+    String educator,
+    Long idEducator,
+    Set<MaterialResponseDTO> materiais,
     List<String> nomeAlunos,
-    List<AvisoResponseDTO> avisos 
+    List<AvisoResponseDTO> avisos
 ) {
 
 }

@@ -37,7 +37,7 @@ public class ClassroomResponseMapper {
                 .collect(Collectors.toList());
                 
         return new ClassroomDetailsDTO(classroom.getCodigo(), classroom.getName(), classroom.getDescription(),
-                classroom.getEducator().getName(), materials, studentNames, avisos);
+                classroom.getEducator().getName(), classroom.getEducator().getId(), materials, studentNames, avisos);
     }
 
     private MaterialResponseDTO toMaterialResponse(Material material) {

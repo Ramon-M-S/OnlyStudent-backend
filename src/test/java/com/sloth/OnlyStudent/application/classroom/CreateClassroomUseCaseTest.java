@@ -23,7 +23,6 @@ import com.sloth.OnlyStudent.entities.DTO.ClassroomDTO;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
 import com.sloth.OnlyStudent.repository.EducatorRepository;
 import com.sloth.OnlyStudent.shared.errors.ClassroomAccessDeniedException;
-import com.sloth.OnlyStudent.shared.errors.ClassroomNameAlreadyExistsException;
 
 @ExtendWith(MockitoExtension.class)
 class CreateClassroomUseCaseTest {
@@ -38,7 +37,6 @@ class CreateClassroomUseCaseTest {
     @Test
     void createsAnActiveClassroomUsingThePrincipalEducatorAndDerivedCost() {
         Educator principalEducator = educator(8L);
-        when(classroomRepository.existsByName("Álgebra")).thenReturn(false);
         when(educatorRepository.findById(8L)).thenReturn(Optional.of(principalEducator));
         when(classroomRepository.save(any(Classroom.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -52,10 +50,7 @@ class CreateClassroomUseCaseTest {
     }
 
     @Test
-    void rejectsDuplicateNamesAndNonEducatorPrincipals() {
-        when(classroomRepository.existsByName("Álgebra")).thenReturn(true);
-        assertThrows(ClassroomNameAlreadyExistsException.class, () -> useCase.execute(
-                new ClassroomDTO("Álgebra", "Aula", 1L, 0), 8L, UserRole.EDUCATOR));
+    void rejectsNonEducatorPrincipals() {
         assertThrows(ClassroomAccessDeniedException.class, () -> useCase.execute(
                 new ClassroomDTO("Outra", "Aula", 1L, 0), 8L, UserRole.STUDENT));
     }
