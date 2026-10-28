@@ -30,6 +30,8 @@ import com.sloth.OnlyStudent.application.administrator.ListAdministratorsUseCase
 import com.sloth.OnlyStudent.application.administrator.UpdateAdministratorUseCase;
 import com.sloth.OnlyStudent.application.material.CreateMaterialUseCase;
 import com.sloth.OnlyStudent.application.material.DeleteMaterialUseCase;
+import com.sloth.OnlyStudent.application.material.MaterialResponseMapper;
+import com.sloth.OnlyStudent.application.material.UpdateMaterialUseCase;
 import com.sloth.OnlyStudent.entities.Classroom;
 import com.sloth.OnlyStudent.entities.Educator;
 import com.sloth.OnlyStudent.entities.User;
@@ -62,6 +64,12 @@ class SecurityAuthorizationTest {
 
     @MockBean
     private DeleteMaterialUseCase deleteMaterialUseCase;
+
+    @MockBean
+    private UpdateMaterialUseCase updateMaterialUseCase;
+
+    @MockBean
+    private MaterialResponseMapper materialResponseMapper;
 
     @MockBean
     private ClassroomRepository classroomRepository;
