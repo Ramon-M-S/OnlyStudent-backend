@@ -9,6 +9,7 @@ import com.sloth.OnlyStudent.entities.DTO.MaterialResponseDTO;
 public class MaterialResponseMapper {
 
     public MaterialResponseDTO toResponse(Material material) {
-        return new MaterialResponseDTO(material.getId(), material.getTipo(), material.getName(), material.getUrl());
+        return new MaterialResponseDTO(material.getId(), material.getTipo(), material.getName(), material.getUrl(),
+                material.getDescricao());
     }
 }

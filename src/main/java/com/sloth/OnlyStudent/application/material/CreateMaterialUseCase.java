@@ -41,6 +41,7 @@ public class CreateMaterialUseCase {
             throw new MaterialAlreadyExistsException();
         }
 
-        return materialRepository.save(Material.criar(request.tipo(), request.name(), request.url(), classroom));
+        return materialRepository.save(
+                Material.criar(request.tipo(), request.name(), request.url(), request.descricao(), classroom));
     }
 }

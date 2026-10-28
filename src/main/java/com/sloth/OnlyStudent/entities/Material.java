@@ -21,6 +21,7 @@ public class Material {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String descricao;
 
     @Enumerated(EnumType.STRING)
     private MaterialType tipo;
@@ -35,10 +36,15 @@ public class Material {
     }
     
     public Material(Long id, String name, MaterialType tipo, String url, Classroom turma) {
+        this(id, name, tipo, url, null, turma);
+    }
+
+    public Material(Long id, String name, MaterialType tipo, String url, String descricao, Classroom turma) {
         this.id = id;
         this.name = name;
         this.tipo = tipo;
         this.url = url;
+        this.descricao = descricao;
         this.turma = turma;
     }
 
@@ -48,6 +54,10 @@ public class Material {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescricao() {
+        return descricao;
     }
 
     public MaterialType getTipo() {
@@ -70,6 +80,10 @@ public class Material {
         this.name = name;
     }
 
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
     public void setTipo(MaterialType tipo) {
         this.tipo = tipo;
     }
@@ -83,6 +97,10 @@ public class Material {
     }
 
     public static Material criar(String tipo, String name, String url, Classroom classroom) {
+        return criar(tipo, name, url, null, classroom);
+    }
+
+    public static Material criar(String tipo, String name, String url, String descricao, Classroom classroom) {
         if (name == null || name.isBlank()) {
             throw new InvalidMaterialException("O nome do material é obrigatório.");
         }
@@ -113,6 +131,7 @@ public class Material {
         material.setTipo(materialType);
         material.setName(name);
         material.setUrl(url);
+        material.setDescricao(descricao);
         material.setTurma(classroom);
         return material;
     }

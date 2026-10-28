@@ -41,7 +41,8 @@ public class ClassroomResponseMapper {
     }
 
     private MaterialResponseDTO toMaterialResponse(Material material) {
-        return new MaterialResponseDTO(material.getId(), material.getTipo(), material.getName(), material.getUrl());
+        return new MaterialResponseDTO(material.getId(), material.getTipo(), material.getName(), material.getUrl(),
+                material.getDescricao());
     }
 
     private AvisoResponseDTO toAvisoResponse(Aviso aviso) {

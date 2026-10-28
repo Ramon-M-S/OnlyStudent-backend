@@ -13,5 +13,11 @@ public record MaterialDTO(
         @NotBlank(message = "A URL do material é obrigatória.")
         String url,
         @NotNull(message = "O código da turma é obrigatório.")
-        Long turmaCodigo) {
+        Long turmaCodigo,
+        @Size(max = 500, message = "A descrição do material deve ter no máximo 500 caracteres.")
+        String descricao) {
+
+    public MaterialDTO(String name, String tipo, String url, Long turmaCodigo) {
+        this(name, tipo, url, turmaCodigo, null);
+    }
 }
