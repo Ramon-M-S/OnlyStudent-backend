@@ -83,6 +83,8 @@ class ApiContractCharacterizationTest {
             org.mockito.Mockito.mock(ListMaterialsUseCase.class);
     private final com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase createAvisoUseCase = 
             org.mockito.Mockito.mock(com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase.class);
+    private final com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase updateClassroomUseCase =
+            org.mockito.Mockito.mock(com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase.class);
 
     @BeforeEach
     void setUp() {
@@ -92,7 +94,7 @@ class ApiContractCharacterizationTest {
        ClassroomController classroomController = new ClassroomController(classroomRepository, materialRepository,
                 classroomService, createClassroomUseCase, joinClassroomUseCase, listStudentClassroomsUseCase,
                 listEducatorClassroomsUseCase, getClassroomDetailsUseCase, searchClassroomsUseCase,
-                listMaterialsUseCase, createAvisoUseCase);
+                listMaterialsUseCase, createAvisoUseCase, updateClassroomUseCase);
 
         HandlerMethodArgumentResolver principalResolver = new HandlerMethodArgumentResolver() {
             @Override

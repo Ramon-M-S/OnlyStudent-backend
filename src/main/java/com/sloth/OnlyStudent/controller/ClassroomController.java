@@ -25,6 +25,7 @@ import com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase;
 import com.sloth.OnlyStudent.application.classroom.CreateClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.GetClassroomDetailsUseCase;
 import com.sloth.OnlyStudent.application.classroom.JoinClassroomUseCase;
+import com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListEducatorClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListStudentClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.SearchClassroomsUseCase;
@@ -66,6 +67,7 @@ public class ClassroomController {
     private final SearchClassroomsUseCase searchClassroomsUseCase;
     private final ListMaterialsUseCase listMaterialsUseCase;
     private final CreateAvisoUseCase createAvisoUseCase;
+    private final UpdateClassroomUseCase updateClassroomUseCase;
 
     // CORREÇÃO AQUI: Adicionado o CreateAvisoUseCase no construtor
     public ClassroomController(ClassroomRepository classroomRepository,
@@ -78,7 +80,8 @@ public class ClassroomController {
             GetClassroomDetailsUseCase getClassroomDetailsUseCase,
             SearchClassroomsUseCase searchClassroomsUseCase,
             ListMaterialsUseCase listMaterialsUseCase,
-            CreateAvisoUseCase createAvisoUseCase) {
+            CreateAvisoUseCase createAvisoUseCase,
+            UpdateClassroomUseCase updateClassroomUseCase) {
         this.classroomRepository = classroomRepository;
         this.materialRepository = materialRepository;
         this.classroomService = classroomService;
@@ -90,6 +93,7 @@ public class ClassroomController {
         this.searchClassroomsUseCase = searchClassroomsUseCase;
         this.listMaterialsUseCase = listMaterialsUseCase;
         this.createAvisoUseCase = createAvisoUseCase;
+        this.updateClassroomUseCase = updateClassroomUseCase;
     }
 
     @GetMapping
@@ -139,6 +143,35 @@ public class ClassroomController {
             @AuthenticationPrincipal User principal) {
         Classroom classroom = findAccessibleClassroom(codigo, principal);
         return ResponseEntity.ok(classroom.getAlunosInfo());
+    }
+
+    @PutMapping("/{codigo}")
+    public ResponseEntity<ClassroomDetailsDTO> updateClassroom(@PathVariable Long codigo,
+            @Valid @RequestBody ClassroomDTO body,
+            @AuthenticationPrincipal User principal) {
+        Classroom updated = updateClassroomUseCase.execute(codigo, body, principal.getId(), principal.getRoles());
+        return ResponseEntity.ok(new ClassroomDetailsDTO(
+                updated.getCodigo(),
+                updated.getName(),
+                updated.getDescription(),
+                updated.getEducator() != null ? updated.getEducator().getName() : null,
+                updated.getMaterials() == null ? Set.of() : updated.getMaterials().stream()
+                        .map(material -> new com.sloth.OnlyStudent.entities.DTO.MaterialResponseDTO(
+                                material.getId(),
+                                material.getTipo(),
+                                material.getName(),
+                                material.getUrl(),
+                                material.getDescricao()))
+                        .collect(java.util.stream.Collectors.toSet()),
+                updated.getAlunos() == null ? List.of() : updated.getAlunos().stream()
+                        .map(com.sloth.OnlyStudent.entities.Student::getName)
+                        .toList(),
+                updated.getAvisos() == null ? List.of() : updated.getAvisos().stream()
+                        .map(aviso -> new com.sloth.OnlyStudent.entities.DTO.AvisoResponseDTO(
+                                aviso.getId(),
+                                aviso.getMensagem(),
+                                aviso.getDataCriacao()))
+                        .toList()));
     }
 
     @DeleteMapping("/{codigo}")
