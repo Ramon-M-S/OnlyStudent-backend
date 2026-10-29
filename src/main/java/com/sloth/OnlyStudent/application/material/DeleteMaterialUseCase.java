@@ -32,5 +32,6 @@ public class DeleteMaterialUseCase {
             throw new MaterialAccessDeniedException();
         }
         materialRepository.delete(material);
+        materialRepository.flush();
     }
 }

@@ -37,6 +37,7 @@ class DeleteMaterialUseCaseTest {
         useCase.execute(19L, 7L, UserRole.EDUCATOR);
 
         verify(materialRepository).delete(material);
+        verify(materialRepository).flush();
     }
 
     @Test

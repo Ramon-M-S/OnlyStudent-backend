@@ -4,6 +4,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,6 +105,28 @@ class SecurityAuthorizationTest {
                         .content("{}"))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("Acesso negado."));
+
+        mockMvc.perform(put("/material/1")
+                        .with(authentication(authenticationFor(7L, UserRole.STUDENT)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Acesso negado."));
+
+        mockMvc.perform(delete("/material/delete/1")
+                        .with(authentication(authenticationFor(7L, UserRole.STUDENT))))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Acesso negado."));
+
+        mockMvc.perform(put("/material/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Autenticação necessária."));
+
+        mockMvc.perform(delete("/material/delete/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Autenticação necessária."));
     }
 
     @Test

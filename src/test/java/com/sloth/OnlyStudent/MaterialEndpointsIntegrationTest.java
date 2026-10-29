@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -113,6 +114,77 @@ class MaterialEndpointsIntegrationTest {
     }
 
     @Test
+    void invalidMaterialPayloadIsRejected() throws Exception {
+        mockMvc.perform(post("/material/register")
+                        .with(as(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"","tipo":"pdf","url":"not-a-url","turmaCodigo":%d}
+                                """.formatted(classroom.getCodigo())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void invalidMaterialUrlIsRejected() throws Exception {
+        mockMvc.perform(post("/material/register")
+                        .with(as(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Apostila","tipo":"pdf","url":"not-a-url","turmaCodigo":%d}
+                                """.formatted(classroom.getCodigo())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void educatorOwnerUpdatesMaterial() throws Exception {
+        Material material = saveMaterial("Apostila");
+
+        mockMvc.perform(put("/material/{id}", material.getId())
+                        .with(as(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(materialRequest(classroom.getCodigo(), "Apostila revisada")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(material.getId()))
+                .andExpect(jsonPath("$.name").value("Apostila revisada"))
+                .andExpect(jsonPath("$.tipo").value("PDF"));
+    }
+
+    @Test
+    void nonOwnerEducatorCannotUpdateMaterial() throws Exception {
+        Material material = saveMaterial("Apostila");
+
+        mockMvc.perform(put("/material/{id}", material.getId())
+                        .with(as(otherEducator))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(materialRequest(classroom.getCodigo(), "Alteração indevida")))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("Apenas o educador responsável pode alterar esta turma."));
+    }
+
+    @Test
+    void updatingMissingMaterialReturnsNotFound() throws Exception {
+        mockMvc.perform(put("/material/{id}", 999999L)
+                        .with(as(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(materialRequest(classroom.getCodigo(), "Apostila")))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Material not found."));
+    }
+
+    @Test
+    void invalidUpdatePayloadReturnsBadRequest() throws Exception {
+        Material material = saveMaterial("Apostila");
+
+        mockMvc.perform(put("/material/{id}", material.getId())
+                        .with(as(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Apostila","tipo":"pdf","url":"invalid","turmaCodigo":%d}
+                                """.formatted(classroom.getCodigo())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void educatorOwnerDeletesMaterialWithPlainTextSuccess() throws Exception {
         Material material = saveMaterial("Apostila");
 
@@ -120,6 +192,10 @@ class MaterialEndpointsIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string("Material deleted successfully."));
+
+        entityManager.flush();
+        entityManager.clear();
+        assertTrue(materialRepository.findById(material.getId()).isEmpty());
     }
 
     @Test
@@ -129,6 +205,13 @@ class MaterialEndpointsIntegrationTest {
         mockMvc.perform(delete("/material/delete/{id}", material.getId()).with(as(otherEducator)))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string("Apenas o educador responsável pode alterar esta turma."));
+    }
+
+    @Test
+    void deletingMissingMaterialReturnsNotFound() throws Exception {
+        mockMvc.perform(delete("/material/delete/{id}", 999999L).with(as(owner)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Material not found."));
     }
 
     @Test
