@@ -31,7 +31,6 @@ public class DeleteMaterialUseCase {
                 || !Objects.equals(material.getTurma().getEducator().getId(), principalId)) {
             throw new MaterialAccessDeniedException();
         }
-        materialRepository.delete(material);
-        materialRepository.flush();
+        materialRepository.deleteMaterialById(materialId);
     }
 }

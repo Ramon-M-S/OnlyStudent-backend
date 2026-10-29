@@ -84,7 +84,7 @@ class CriticalCorrectionsTest {
         when(materials.findById(91L)).thenReturn(Optional.of(material));
 
         useCase.execute(91L, owner.getId(), owner.getRoles());
-        verify(materials).delete(material);
+        verify(materials).deleteMaterialById(91L);
     }
 
     @Test
