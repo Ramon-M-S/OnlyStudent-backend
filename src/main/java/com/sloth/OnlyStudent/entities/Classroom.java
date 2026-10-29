@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import com.sloth.OnlyStudent.entities.DTO.StudentIdDTO;
 import com.sloth.OnlyStudent.shared.errors.AlunoJaMatriculadoException;
@@ -48,6 +49,8 @@ public class Classroom {
 	private Custo custo;
 	
 	private double price;
+
+	private LocalDateTime dataExclusaoAgendada;
 	
 	@ManyToMany
     @JoinTable(
@@ -119,6 +122,10 @@ public class Classroom {
 		return price;
 	}
 
+	public LocalDateTime getDataExclusaoAgendada() {
+		return dataExclusaoAgendada;
+	}
+
 	public Set<Student> getAlunos() {
 		return alunos;
 	}
@@ -161,6 +168,10 @@ public class Classroom {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setDataExclusaoAgendada(LocalDateTime dataExclusaoAgendada) {
+		this.dataExclusaoAgendada = dataExclusaoAgendada;
 	}
 
 	public void setAlunos(Set<Student> alunos) {

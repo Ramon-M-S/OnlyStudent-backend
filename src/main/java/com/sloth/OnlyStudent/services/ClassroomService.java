@@ -45,7 +45,8 @@ public class ClassroomService {
                     classroom.getCusto(),
                     classroom.getPrice(),
                     classroom.getTotalAlunos(),
-                    classroom.getTotalMateriais()
+                    classroom.getTotalMateriais(),
+                    classroom.getDataExclusaoAgendada()
             );
             dtoList.add(dto);
         }
@@ -66,7 +67,8 @@ public class ClassroomService {
                     classroom.getCusto(),
                     classroom.getPrice(),
                     classroom.getTotalAlunos(),
-                    classroom.getTotalMateriais()
+                    classroom.getTotalMateriais(),
+                    classroom.getDataExclusaoAgendada()
             );
             dtoList.add(dto);
         }
@@ -86,7 +88,8 @@ public class ClassroomService {
                 classroom.getCusto(),
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
-                classroom.getTotalMateriais()
+                classroom.getTotalMateriais(),
+                classroom.getDataExclusaoAgendada()
             ));
     }
     
@@ -102,7 +105,8 @@ public class ClassroomService {
                 classroom.getCusto(),
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
-                classroom.getTotalMateriais()
+                classroom.getTotalMateriais(),
+                classroom.getDataExclusaoAgendada()
             ));
     }
 
@@ -140,7 +144,8 @@ public class ClassroomService {
 	            classroom.getCusto(),
 	            classroom.getPrice(),
 	            classroom.getTotalAlunos(),
-	            classroom.getTotalMateriais()
+	            classroom.getTotalMateriais(),
+	            classroom.getDataExclusaoAgendada()
 	        ))
 	        .collect(Collectors.toList());
 
@@ -168,7 +173,8 @@ public class ClassroomService {
                 classroom.getCusto(),
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
-                classroom.getTotalMateriais()
+                classroom.getTotalMateriais(),
+                classroom.getDataExclusaoAgendada()
             ));
     }
 	

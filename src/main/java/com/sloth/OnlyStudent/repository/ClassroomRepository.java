@@ -2,6 +2,7 @@ package com.sloth.OnlyStudent.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,8 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
 	List<Classroom> findTop3ByAlunosIdOrderByCodigoAsc(Long studentId);
 	
 	boolean existsByName(String name);
+
+	List<Classroom> findByDataExclusaoAgendadaLessThanEqual(LocalDateTime data);
 
 	Optional<Classroom> findByName(String name);
 

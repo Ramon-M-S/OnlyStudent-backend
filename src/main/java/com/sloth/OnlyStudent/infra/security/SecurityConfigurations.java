@@ -98,6 +98,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/turma/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/turma/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.DELETE, "/turma/**").hasRole("EDUCATOR")
+                        .requestMatchers(HttpMethod.PATCH, "/turma/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.POST, "/material/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.DELETE, "/material/**").hasRole("EDUCATOR")
                         .requestMatchers(HttpMethod.GET, "/material/**").hasRole("EDUCATOR")
