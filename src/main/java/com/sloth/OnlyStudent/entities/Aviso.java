@@ -21,12 +21,21 @@ public class Aviso {
     @JoinColumn(name = "classroom_id", nullable = false)
     private Classroom classroom;
 
+    @ManyToOne
+    @JoinColumn(name = "autor_id")
+    private User autor;
+
     public Aviso() {
     }
 
     public Aviso(String mensagem, Classroom classroom) {
+        this(mensagem, classroom, null);
+    }
+
+    public Aviso(String mensagem, Classroom classroom, User autor) {
         this.mensagem = mensagem;
         this.classroom = classroom;
+        this.autor = autor;
         this.dataCriacao = LocalDateTime.now();
     }
 
@@ -42,4 +51,7 @@ public class Aviso {
 
     public Classroom getClassroom() { return classroom; }
     public void setClassroom(Classroom classroom) { this.classroom = classroom; }
+
+    public User getAutor() { return autor; }
+    public void setAutor(User autor) { this.autor = autor; }
 }

@@ -75,6 +75,16 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
     }
 
+    @ExceptionHandler(AvisoNotFoundException.class)
+    public ResponseEntity<String> handleAvisoNotFound(AvisoNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(AvisoAccessDeniedException.class)
+    public ResponseEntity<String> handleAvisoAccessDenied(AvisoAccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
+    }
+
     @ExceptionHandler(ClassroomNameAlreadyExistsException.class)
     public ResponseEntity<String> handleClassroomNameAlreadyExists(ClassroomNameAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());

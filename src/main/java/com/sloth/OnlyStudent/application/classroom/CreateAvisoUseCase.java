@@ -32,7 +32,7 @@ public class CreateAvisoUseCase {
             throw new ClassroomAccessDeniedException();
         }
 
-        Aviso aviso = new Aviso(mensagem, classroom);
+        Aviso aviso = new Aviso(mensagem, classroom, principal);
         classroom.getAvisos().add(aviso);
         classroomRepository.save(classroom);
     }
