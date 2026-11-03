@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase;
 import com.sloth.OnlyStudent.application.classroom.DeleteAvisoUseCase;
+import com.sloth.OnlyStudent.application.classroom.UpdateAvisoUseCase;
 import com.sloth.OnlyStudent.application.classroom.CancelClassroomDeletionUseCase;
 import com.sloth.OnlyStudent.application.classroom.CreateClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.GetClassroomDetailsUseCase;
@@ -39,6 +40,8 @@ import com.sloth.OnlyStudent.entities.Classroom;
 import com.sloth.OnlyStudent.entities.Material;
 import com.sloth.OnlyStudent.entities.User;
 import com.sloth.OnlyStudent.entities.UserRole;
+import com.sloth.OnlyStudent.entities.DTO.AvisoResponseDTO;
+import com.sloth.OnlyStudent.entities.DTO.AvisoRequestDTO;
 import com.sloth.OnlyStudent.entities.DTO.ClassroomDetailsDTO;
 import com.sloth.OnlyStudent.entities.DTO.ClassroomDTO;
 import com.sloth.OnlyStudent.entities.DTO.ClassroomNameDTO;
@@ -73,6 +76,7 @@ public class ClassroomController {
     private final ListMaterialsUseCase listMaterialsUseCase;
     private final CreateAvisoUseCase createAvisoUseCase;
     private final DeleteAvisoUseCase deleteAvisoUseCase;
+    private final UpdateAvisoUseCase updateAvisoUseCase;
     private final UpdateClassroomUseCase updateClassroomUseCase;
     private final ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase;
     private final CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase;
@@ -91,6 +95,7 @@ public class ClassroomController {
             ListMaterialsUseCase listMaterialsUseCase,
             CreateAvisoUseCase createAvisoUseCase,
             DeleteAvisoUseCase deleteAvisoUseCase,
+            UpdateAvisoUseCase updateAvisoUseCase,
             UpdateClassroomUseCase updateClassroomUseCase,
             ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase,
             CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase) {
@@ -106,6 +111,7 @@ public class ClassroomController {
         this.listMaterialsUseCase = listMaterialsUseCase;
         this.createAvisoUseCase = createAvisoUseCase;
         this.deleteAvisoUseCase = deleteAvisoUseCase;
+        this.updateAvisoUseCase = updateAvisoUseCase;
         this.updateClassroomUseCase = updateClassroomUseCase;
         this.scheduleClassroomDeletionUseCase = scheduleClassroomDeletionUseCase;
         this.cancelClassroomDeletionUseCase = cancelClassroomDeletionUseCase;
@@ -125,7 +131,28 @@ public class ClassroomController {
             UpdateClassroomUseCase updateClassroomUseCase) {
         this(classroomRepository, materialRepository, classroomService, createClassroomUseCase, joinClassroomUseCase,
                 listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
-                searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, updateClassroomUseCase,
+                searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, null, updateClassroomUseCase,
+                new ScheduleClassroomDeletionUseCase(classroomRepository),
+                new CancelClassroomDeletionUseCase(classroomRepository));
+    }
+
+    public ClassroomController(ClassroomRepository classroomRepository,
+            MaterialRepository materialRepository,
+            ClassroomService classroomService,
+            CreateClassroomUseCase createClassroomUseCase,
+            JoinClassroomUseCase joinClassroomUseCase,
+            ListStudentClassroomsUseCase listStudentClassroomsUseCase,
+            ListEducatorClassroomsUseCase listEducatorClassroomsUseCase,
+            GetClassroomDetailsUseCase getClassroomDetailsUseCase,
+            SearchClassroomsUseCase searchClassroomsUseCase,
+            ListMaterialsUseCase listMaterialsUseCase,
+            CreateAvisoUseCase createAvisoUseCase,
+            UpdateAvisoUseCase updateAvisoUseCase,
+            UpdateClassroomUseCase updateClassroomUseCase) {
+        this(classroomRepository, materialRepository, classroomService, createClassroomUseCase, joinClassroomUseCase,
+                listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
+                searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, updateAvisoUseCase,
+                updateClassroomUseCase,
                 new ScheduleClassroomDeletionUseCase(classroomRepository),
                 new CancelClassroomDeletionUseCase(classroomRepository));
     }
@@ -278,17 +305,29 @@ public class ClassroomController {
         return listMaterialsUseCase.execute(codigo, principal.getId(), Pageable.unpaged());
     }
 
+    @GetMapping("/{codigo}/avisos")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<AvisoResponseDTO>> listarAvisos(@PathVariable Long codigo) {
+        Classroom classroom = classroomRepository.findById(codigo)
+                .orElseThrow(ClassroomNotFoundException::new);
+        List<AvisoResponseDTO> avisos = classroom.getAvisos().stream()
+                .map(aviso -> new AvisoResponseDTO(aviso.getId(), aviso.getMensagem(), aviso.getDataCriacao()))
+                .toList();
+        return ResponseEntity.ok(avisos);
+    }
+
     // CORREÇÃO AQUI: Adicionado o Endpoint de criar Aviso
     @PostMapping("/{id}/avisos")
-    public ResponseEntity<String> criarAviso(@PathVariable Long id,
+    public ResponseEntity<?> criarAviso(@PathVariable Long id,
             @RequestBody Map<String, String> body,
             @AuthenticationPrincipal User principal) {
         String mensagem = body.get("mensagem");
         if (mensagem == null || mensagem.isBlank()) {
             return ResponseEntity.badRequest().body("A mensagem não pode estar vazia.");
         }
-        createAvisoUseCase.execute(id, mensagem, principal);
-        return ResponseEntity.status(201).body("Aviso publicado com sucesso.");
+        var aviso = createAvisoUseCase.execute(id, mensagem, principal);
+        return ResponseEntity.status(201)
+                .body(new AvisoResponseDTO(aviso.getId(), aviso.getMensagem(), aviso.getDataCriacao()));
     }
 
     @DeleteMapping("/{turmaId}/avisos/{avisoId}")
@@ -296,6 +335,14 @@ public class ClassroomController {
             @AuthenticationPrincipal User principal) {
         deleteAvisoUseCase.execute(avisoId, principal);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{turmaId}/avisos/{avisoId}")
+    public ResponseEntity<AvisoResponseDTO> editarAviso(@PathVariable Long turmaId, @PathVariable Long avisoId,
+            @Valid @RequestBody AvisoRequestDTO body,
+            @AuthenticationPrincipal User principal) {
+        var aviso = updateAvisoUseCase.execute(avisoId, body.mensagem(), principal);
+        return ResponseEntity.ok(new AvisoResponseDTO(aviso.getId(), aviso.getMensagem(), aviso.getDataCriacao()));
     }
 
     private Classroom findAccessibleClassroom(Long code, User principal) {

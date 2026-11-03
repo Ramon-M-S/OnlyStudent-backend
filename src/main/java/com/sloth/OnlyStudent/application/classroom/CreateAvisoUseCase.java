@@ -20,7 +20,7 @@ public class CreateAvisoUseCase {
     }
 
     @Transactional
-    public void execute(Long turmaId, String mensagem, User principal) {
+    public Aviso execute(Long turmaId, String mensagem, User principal) {
         if (principal.getRole() != UserRole.EDUCATOR) {
             throw new ClassroomAccessDeniedException();
         }
@@ -34,6 +34,7 @@ public class CreateAvisoUseCase {
 
         Aviso aviso = new Aviso(mensagem, classroom, principal);
         classroom.getAvisos().add(aviso);
-        classroomRepository.save(classroom);
+        classroomRepository.saveAndFlush(classroom);
+        return aviso;
     }
 }

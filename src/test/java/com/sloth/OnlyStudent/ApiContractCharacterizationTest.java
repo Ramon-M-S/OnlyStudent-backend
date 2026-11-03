@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,11 +39,13 @@ import com.sloth.OnlyStudent.application.classroom.JoinClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListEducatorClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListStudentClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.SearchClassroomsUseCase;
+import com.sloth.OnlyStudent.application.classroom.UpdateAvisoUseCase;
 import com.sloth.OnlyStudent.application.material.ListMaterialsUseCase;
 import com.sloth.OnlyStudent.controller.AuthenticationController;
 import com.sloth.OnlyStudent.controller.ClassroomController;
 import com.sloth.OnlyStudent.entities.Classroom;
 import com.sloth.OnlyStudent.entities.Custo;
+import com.sloth.OnlyStudent.entities.Aviso;
 import com.sloth.OnlyStudent.entities.Status;
 import com.sloth.OnlyStudent.entities.User;
 import com.sloth.OnlyStudent.entities.UserRole;
@@ -85,6 +88,8 @@ class ApiContractCharacterizationTest {
             org.mockito.Mockito.mock(com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase.class);
     private final com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase updateClassroomUseCase =
             org.mockito.Mockito.mock(com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase.class);
+    private final UpdateAvisoUseCase updateAvisoUseCase =
+            org.mockito.Mockito.mock(UpdateAvisoUseCase.class);
 
     @BeforeEach
     void setUp() {
@@ -94,7 +99,7 @@ class ApiContractCharacterizationTest {
        ClassroomController classroomController = new ClassroomController(classroomRepository, materialRepository,
                 classroomService, createClassroomUseCase, joinClassroomUseCase, listStudentClassroomsUseCase,
                 listEducatorClassroomsUseCase, getClassroomDetailsUseCase, searchClassroomsUseCase,
-                listMaterialsUseCase, createAvisoUseCase, updateClassroomUseCase);
+                listMaterialsUseCase, createAvisoUseCase, updateAvisoUseCase, updateClassroomUseCase);
 
         HandlerMethodArgumentResolver principalResolver = new HandlerMethodArgumentResolver() {
             @Override
@@ -257,6 +262,52 @@ class ApiContractCharacterizationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Entrada confirmada com sucesso."));
         verify(joinClassroomUseCase).execute(12L, 7L, UserRole.STUDENT);
+    }
+
+    @Test
+    void avisoCreationReturnsPersistedId() throws Exception {
+        principal = user(3L, UserRole.EDUCATOR);
+        Aviso aviso = new Aviso("Prova amanhã", new Classroom(), principal);
+        aviso.setId(42L);
+        when(createAvisoUseCase.execute(eq(12L), eq("Prova amanhã"), eq(principal))).thenReturn(aviso);
+
+        mockMvc.perform(post("/turma/12/avisos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"mensagem\":\"Prova amanhã\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(42))
+                .andExpect(jsonPath("$.mensagem").value("Prova amanhã"))
+                .andExpect(jsonPath("$.dataCriacao").isNotEmpty());
+    }
+
+    @Test
+    void avisoListingReturnsAvisosFromClassroom() throws Exception {
+        Classroom classroom = new Classroom();
+        Aviso aviso = new Aviso("Aviso existente", classroom);
+        aviso.setId(42L);
+        classroom.setAvisos(List.of(aviso));
+        when(classroomRepository.findById(12L)).thenReturn(java.util.Optional.of(classroom));
+
+        mockMvc.perform(get("/turma/12/avisos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(42))
+                .andExpect(jsonPath("$[0].mensagem").value("Aviso existente"))
+                .andExpect(jsonPath("$[0].dataCriacao").isNotEmpty());
+    }
+
+    @Test
+    void avisoUpdateReturnsUpdatedAviso() throws Exception {
+        principal = user(3L, UserRole.EDUCATOR);
+        Aviso aviso = new Aviso("Mensagem atualizada", new Classroom(), principal);
+        aviso.setId(42L);
+        when(updateAvisoUseCase.execute(eq(42L), eq("Mensagem atualizada"), eq(principal))).thenReturn(aviso);
+
+        mockMvc.perform(put("/turma/12/avisos/42")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"mensagem\":\"Mensagem atualizada\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(42))
+                .andExpect(jsonPath("$.mensagem").value("Mensagem atualizada"));
     }
 
     @Test
