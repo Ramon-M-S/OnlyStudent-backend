@@ -44,12 +44,9 @@ Mudanças que afetam o front são registradas aqui.
   - Impacto no front: nenhum (JSON é order-agnostic; `JSON.parse`
     não depende de ordem)
   - Preservados: nomes dos campos, tipos, valores, presença
-## 2026-11-03 — Upload de imagens de turmas
+## 2026-11-03 — URLs de imagens de turmas
 
-- **POST /turma/{codigo}/imagens** recebe `multipart/form-data` com os campos opcionais
-  `capa` e `perfil`.
-- Os arquivos devem ser imagens; o backend publica-os no Cloudinary e persiste as URLs
-  públicas na turma (`coverImageUrl` e `profileImageUrl`).
-- O endpoint exige que o usuário autenticado seja o educador proprietário da turma.
-- Configure `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` e `CLOUDINARY_API_SECRET`
-  no ambiente da aplicação.
+- As URLs `coverImageUrl` e `profileImageUrl` são recebidas como texto no JSON de
+  criação e atualização da turma.
+- O backend persiste os links informados pelo usuário sem realizar upload ou hospedagem
+  de arquivos.

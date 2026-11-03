@@ -11,5 +11,11 @@ public record ClassroomDTO(
         String description,
         Long idEducator,
         @PositiveOrZero(message = "O preço da turma não pode ser negativo.")
-        double price) {
+        double price,
+        String coverImageUrl,
+        String profileImageUrl) {
+
+    public ClassroomDTO(String name, String description, Long idEducator, double price) {
+        this(name, description, idEducator, price, null, null);
+    }
 }

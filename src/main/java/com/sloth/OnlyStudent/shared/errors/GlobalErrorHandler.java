@@ -105,12 +105,6 @@ public class GlobalErrorHandler {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
-    @ExceptionHandler(InvalidImageException.class)
-    public ResponseEntity<String> handleInvalidImage(InvalidImageException exception) {
-        logger.warn("Invalid classroom image upload: {}", exception.getMessage());
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
     @ExceptionHandler(MaterialNotFoundException.class)
     public ResponseEntity<String> handleMaterialNotFound(MaterialNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());

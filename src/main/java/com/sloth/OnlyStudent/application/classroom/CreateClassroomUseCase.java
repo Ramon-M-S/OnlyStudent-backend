@@ -30,7 +30,9 @@ public class CreateClassroomUseCase {
         }
         Educator educator = educatorRepository.findById(principalId)
                 .orElseThrow(EducatorNotFoundException::new);
-        return classroomRepository.save(Classroom.criar(request.name(), request.description(), educator,
-                request.price()));
+        Classroom classroom = Classroom.criar(request.name(), request.description(), educator, request.price());
+        classroom.setCoverImageUrl(request.coverImageUrl());
+        classroom.setProfileImageUrl(request.profileImageUrl());
+        return classroomRepository.save(classroom);
     }
 }
