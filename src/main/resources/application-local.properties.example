@@ -5,3 +5,8 @@ spring.datasource.password=onlystudent
 spring.jpa.show-sql=true
 logging.level.org.hibernate.SQL=DEBUG
 api.security.token.security=chave-local-de-teste-123
+
+# Cloudinary
+cloudinary.cloud-name=
+cloudinary.api-key=
+cloudinary.api-secret=

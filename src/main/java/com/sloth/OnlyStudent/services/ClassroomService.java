@@ -46,7 +46,9 @@ public class ClassroomService {
                     classroom.getPrice(),
                     classroom.getTotalAlunos(),
                     classroom.getTotalMateriais(),
-                    classroom.getDataExclusaoAgendada()
+                    classroom.getDataExclusaoAgendada(),
+                    classroom.getCoverImageUrl(),
+                    classroom.getProfileImageUrl()
             );
             dtoList.add(dto);
         }
@@ -68,7 +70,9 @@ public class ClassroomService {
                     classroom.getPrice(),
                     classroom.getTotalAlunos(),
                     classroom.getTotalMateriais(),
-                    classroom.getDataExclusaoAgendada()
+                    classroom.getDataExclusaoAgendada(),
+                    classroom.getCoverImageUrl(),
+                    classroom.getProfileImageUrl()
             );
             dtoList.add(dto);
         }
@@ -89,7 +93,9 @@ public class ClassroomService {
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
                 classroom.getTotalMateriais(),
-                classroom.getDataExclusaoAgendada()
+                classroom.getDataExclusaoAgendada(),
+                classroom.getCoverImageUrl(),
+                classroom.getProfileImageUrl()
             ));
     }
     
@@ -106,7 +112,9 @@ public class ClassroomService {
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
                 classroom.getTotalMateriais(),
-                classroom.getDataExclusaoAgendada()
+                classroom.getDataExclusaoAgendada(),
+                classroom.getCoverImageUrl(),
+                classroom.getProfileImageUrl()
             ));
     }
 
@@ -145,7 +153,9 @@ public class ClassroomService {
 	            classroom.getPrice(),
 	            classroom.getTotalAlunos(),
 	            classroom.getTotalMateriais(),
-	            classroom.getDataExclusaoAgendada()
+	            classroom.getDataExclusaoAgendada(),
+	            classroom.getCoverImageUrl(),
+	            classroom.getProfileImageUrl()
 	        ))
 	        .collect(Collectors.toList());
 
@@ -174,7 +184,9 @@ public class ClassroomService {
                 classroom.getPrice(),
                 classroom.getTotalAlunos(),
                 classroom.getTotalMateriais(),
-                classroom.getDataExclusaoAgendada()
+                classroom.getDataExclusaoAgendada(),
+                classroom.getCoverImageUrl(),
+                classroom.getProfileImageUrl()
             ));
     }
 	

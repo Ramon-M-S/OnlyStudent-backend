@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sloth.OnlyStudent.application.classroom.CreateAvisoUseCase;
 import com.sloth.OnlyStudent.application.classroom.DeleteAvisoUseCase;
@@ -50,6 +52,7 @@ import com.sloth.OnlyStudent.entities.DTO.StudentRequestDTO;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
 import com.sloth.OnlyStudent.repository.MaterialRepository;
 import com.sloth.OnlyStudent.services.ClassroomService;
+import com.sloth.OnlyStudent.services.CloudinaryImageService;
 import com.sloth.OnlyStudent.shared.errors.ClassroomAccessDeniedException;
 import com.sloth.OnlyStudent.shared.errors.ClassroomNotFoundException;
 
@@ -76,6 +79,7 @@ public class ClassroomController {
     private final UpdateClassroomUseCase updateClassroomUseCase;
     private final ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase;
     private final CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase;
+    private final CloudinaryImageService cloudinaryImageService;
 
     // CORREÇÃO AQUI: Adicionado o CreateAvisoUseCase no construtor
     @Autowired
@@ -93,7 +97,8 @@ public class ClassroomController {
             DeleteAvisoUseCase deleteAvisoUseCase,
             UpdateClassroomUseCase updateClassroomUseCase,
             ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase,
-            CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase) {
+            CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase,
+            CloudinaryImageService cloudinaryImageService) {
         this.classroomRepository = classroomRepository;
         this.materialRepository = materialRepository;
         this.classroomService = classroomService;
@@ -109,6 +114,7 @@ public class ClassroomController {
         this.updateClassroomUseCase = updateClassroomUseCase;
         this.scheduleClassroomDeletionUseCase = scheduleClassroomDeletionUseCase;
         this.cancelClassroomDeletionUseCase = cancelClassroomDeletionUseCase;
+        this.cloudinaryImageService = cloudinaryImageService;
     }
 
     public ClassroomController(ClassroomRepository classroomRepository,
@@ -127,7 +133,7 @@ public class ClassroomController {
                 listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
                 searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, updateClassroomUseCase,
                 new ScheduleClassroomDeletionUseCase(classroomRepository),
-                new CancelClassroomDeletionUseCase(classroomRepository));
+                new CancelClassroomDeletionUseCase(classroomRepository), null);
     }
 
     @GetMapping
@@ -207,7 +213,47 @@ public class ClassroomController {
                                 aviso.getMensagem(),
                                 aviso.getDataCriacao()))
                         .toList(),
-                updated.getDataExclusaoAgendada()));
+                updated.getDataExclusaoAgendada(), updated.getCoverImageUrl(), updated.getProfileImageUrl()));
+    }
+
+    @PostMapping("/{codigo}/imagens")
+    @Transactional
+    public ResponseEntity<ClassroomDetailsDTO> uploadClassroomImages(
+            @PathVariable Long codigo,
+            @RequestPart(value = "capa", required = false) MultipartFile coverImage,
+            @RequestPart(value = "perfil", required = false) MultipartFile profileImage,
+            @AuthenticationPrincipal User principal) {
+        if (cloudinaryImageService == null) {
+            throw new IllegalStateException("Serviço de imagens não configurado.");
+        }
+        Classroom classroom = classroomRepository.findById(codigo)
+                .orElseThrow(ClassroomNotFoundException::new);
+        requireEducatorOwner(classroom, principal);
+        if (coverImage == null && profileImage == null) {
+            throw new com.sloth.OnlyStudent.shared.errors.InvalidImageException(
+                    "Envie pelo menos uma imagem nos campos capa ou perfil.");
+        }
+        if (coverImage != null) {
+            classroom.setCoverImageUrl(cloudinaryImageService.upload(coverImage, codigo, "capa"));
+        }
+        if (profileImage != null) {
+            classroom.setProfileImageUrl(cloudinaryImageService.upload(profileImage, codigo, "perfil"));
+        }
+        Classroom saved = classroomRepository.save(classroom);
+        return ResponseEntity.ok(new ClassroomDetailsDTO(
+                saved.getCodigo(), saved.getName(), saved.getDescription(),
+                saved.getEducator() == null ? null : saved.getEducator().getName(),
+                saved.getEducator() == null ? null : saved.getEducator().getId(),
+                saved.getMaterials() == null ? Set.of() : saved.getMaterials().stream()
+                        .map(material -> new MaterialResponseDTO(material.getId(), material.getTipo(),
+                                material.getName(), material.getUrl(), material.getDescricao()))
+                        .collect(java.util.stream.Collectors.toSet()),
+                saved.getAlunos() == null ? List.of() : saved.getAlunos().stream()
+                        .map(com.sloth.OnlyStudent.entities.Student::getName).toList(),
+                saved.getAvisos() == null ? List.of() : saved.getAvisos().stream()
+                        .map(aviso -> new com.sloth.OnlyStudent.entities.DTO.AvisoResponseDTO(
+                                aviso.getId(), aviso.getMensagem(), aviso.getDataCriacao())).toList(),
+                saved.getDataExclusaoAgendada(), saved.getCoverImageUrl(), saved.getProfileImageUrl()));
     }
 
     @DeleteMapping("/{codigo}")

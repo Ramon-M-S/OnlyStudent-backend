@@ -50,6 +50,12 @@ public class Classroom {
 	
 	private double price;
 
+	@Column(length = 2048)
+	private String coverImageUrl;
+
+	@Column(length = 2048)
+	private String profileImageUrl;
+
 	private LocalDateTime dataExclusaoAgendada;
 	
 	@ManyToMany
@@ -122,6 +128,14 @@ public class Classroom {
 		return price;
 	}
 
+	public String getCoverImageUrl() {
+		return coverImageUrl;
+	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
 	public LocalDateTime getDataExclusaoAgendada() {
 		return dataExclusaoAgendada;
 	}
@@ -168,6 +182,14 @@ public class Classroom {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setCoverImageUrl(String coverImageUrl) {
+		this.coverImageUrl = coverImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	public void setDataExclusaoAgendada(LocalDateTime dataExclusaoAgendada) {

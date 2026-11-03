@@ -13,11 +13,20 @@ public record ClassroomDetailsDTO(
     Set<MaterialResponseDTO> materiais,
     List<String> nomeAlunos,
     List<AvisoResponseDTO> avisos,
-    LocalDateTime dataExclusaoAgendada
+    LocalDateTime dataExclusaoAgendada,
+    String coverImageUrl,
+    String profileImageUrl
 ) {
 
     public ClassroomDetailsDTO(Long codigo, String name, String description, String educator, Long idEducator,
             Set<MaterialResponseDTO> materiais, List<String> nomeAlunos, List<AvisoResponseDTO> avisos) {
         this(codigo, name, description, educator, idEducator, materiais, nomeAlunos, avisos, null);
+    }
+
+    public ClassroomDetailsDTO(Long codigo, String name, String description, String educator, Long idEducator,
+            Set<MaterialResponseDTO> materiais, List<String> nomeAlunos, List<AvisoResponseDTO> avisos,
+            LocalDateTime dataExclusaoAgendada) {
+        this(codigo, name, description, educator, idEducator, materiais, nomeAlunos, avisos,
+                dataExclusaoAgendada, null, null);
     }
 }
