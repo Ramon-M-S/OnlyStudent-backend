@@ -97,6 +97,42 @@ class ProfileEndpointsIntegrationTest {
     }
 
     @Test
+    void studentUsesCanonicalProfileRoutesAndPayload() throws Exception {
+        when(studentRepository.findById(7L)).thenReturn(Optional.of(student()));
+        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(get("/student/profile")
+                        .with(authentication(authenticationFor(7L, UserRole.STUDENT))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana"))
+                .andExpect(jsonPath("$.telefone").value("111"));
+
+        mockMvc.perform(put("/student/profile")
+                        .with(authentication(authenticationFor(7L, UserRole.STUDENT)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Ana Nova","telephone":"222","password":"new-password"}
+                                """))
+                .andExpect(status().isOk());
+
+        var savedStudent = org.mockito.ArgumentCaptor.forClass(Student.class);
+        verify(studentRepository).save(savedStudent.capture());
+        org.junit.jupiter.api.Assertions.assertEquals("Ana Nova", savedStudent.getValue().getName());
+        org.junit.jupiter.api.Assertions.assertEquals("222", savedStudent.getValue().getTelephone());
+        org.junit.jupiter.api.Assertions.assertNotEquals("new-password", savedStudent.getValue().getPassword());
+    }
+
+    @Test
+    void profileRoutesRequireAuthentication() throws Exception {
+        mockMvc.perform(get("/student/profile"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(put("/educator/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void studentCannotReadAnotherStudentProfile() throws Exception {
         mockMvc.perform(get("/student/atualUser")
                         .queryParam("id", "8")
@@ -153,6 +189,32 @@ class ProfileEndpointsIntegrationTest {
         verify(educatorRepository).findById(9L);
         verify(educatorRepository).save(any(Educator.class));
     }
+
+        @Test
+        void educatorUsesCanonicalProfileRoutesAndPayload() throws Exception {
+                when(educatorRepository.findById(9L)).thenReturn(Optional.of(educator()));
+                when(educatorRepository.save(any(Educator.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+                mockMvc.perform(get("/educator/profile")
+                                                .with(authentication(authenticationFor(9L, UserRole.EDUCATOR))))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.especialidade").value("Math"));
+
+                mockMvc.perform(put("/educator/profile")
+                                                .with(authentication(authenticationFor(9L, UserRole.EDUCATOR)))
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("""
+                                                                {"name":"Edu Nova","telephone":"444","password":"new-password","especialidade":"Science"}
+                                                                """))
+                                .andExpect(status().isOk());
+
+                var savedEducator = org.mockito.ArgumentCaptor.forClass(Educator.class);
+                verify(educatorRepository).save(savedEducator.capture());
+                org.junit.jupiter.api.Assertions.assertEquals("Edu Nova", savedEducator.getValue().getName());
+                org.junit.jupiter.api.Assertions.assertEquals("444", savedEducator.getValue().getTelephone());
+                org.junit.jupiter.api.Assertions.assertEquals("Science", savedEducator.getValue().getEspecialidade());
+                org.junit.jupiter.api.Assertions.assertNotEquals("new-password", savedEducator.getValue().getPassword());
+        }
 
     @Test
     void educatorCannotReadAnotherEducatorProfile() throws Exception {

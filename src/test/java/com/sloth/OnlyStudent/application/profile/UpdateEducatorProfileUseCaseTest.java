@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sloth.OnlyStudent.entities.Educator;
 import com.sloth.OnlyStudent.entities.UserRole;
@@ -21,8 +22,9 @@ import com.sloth.OnlyStudent.shared.errors.ProfileAccessDeniedException;
 class UpdateEducatorProfileUseCaseTest {
 
     private final EducatorRepository educatorRepository = mock(EducatorRepository.class);
+        private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final UpdateEducatorProfileUseCase useCase =
-            new UpdateEducatorProfileUseCase(educatorRepository, new EducatorProfileMapper());
+            new UpdateEducatorProfileUseCase(educatorRepository, new EducatorProfileMapper(), passwordEncoder);
 
     @Test
     void updatesOnlyTheAuthenticatedEducatorProfile() {
@@ -49,6 +51,19 @@ class UpdateEducatorProfileUseCaseTest {
                         new EducatorDTO("Intruso", "222", "other@example.com", "Science")));
         verify(educatorRepository).findById(9L);
         verifyNoMoreInteractions(educatorRepository);
+    }
+
+    @Test
+    void updatesPasswordAndSpecialtyWhenProvided() {
+        Educator educator = educator();
+        when(educatorRepository.findById(9L)).thenReturn(Optional.of(educator));
+        when(educatorRepository.save(any(Educator.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passwordEncoder.encode("new-password")).thenReturn("encoded-password");
+
+        useCase.execute(9L, null, new EducatorDTO("Edu", "222", null, "Science", "new-password"));
+
+        assertEquals("encoded-password", educator.getPassword());
+        verify(passwordEncoder).encode("new-password");
     }
 
     private Educator educator() {

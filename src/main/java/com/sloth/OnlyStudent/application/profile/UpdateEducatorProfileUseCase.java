@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sloth.OnlyStudent.entities.Educator;
 import com.sloth.OnlyStudent.entities.DTO.EducatorDTO;
@@ -16,10 +17,13 @@ public class UpdateEducatorProfileUseCase {
 
     private final EducatorRepository educatorRepository;
     private final EducatorProfileMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UpdateEducatorProfileUseCase(EducatorRepository educatorRepository, EducatorProfileMapper mapper) {
+    public UpdateEducatorProfileUseCase(EducatorRepository educatorRepository, EducatorProfileMapper mapper,
+            PasswordEncoder passwordEncoder) {
         this.educatorRepository = educatorRepository;
         this.mapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -34,8 +38,11 @@ public class UpdateEducatorProfileUseCase {
             throw new ProfileAccessDeniedException();
         }
         educator.setName(request.name());
-        educator.setTelephone(request.telefone());
+        educator.setTelephone(request.telephone());
         educator.setEspecialidade(request.especialidade());
+        if (request.password() != null && !request.password().isBlank()) {
+            educator.setPassword(passwordEncoder.encode(request.password()));
+        }
         return Optional.of(mapper.toResponse(educatorRepository.save(educator)));
     }
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sloth.OnlyStudent.entities.Student;
 import com.sloth.OnlyStudent.entities.UserRole;
@@ -21,8 +22,9 @@ import com.sloth.OnlyStudent.shared.errors.ProfileAccessDeniedException;
 class UpdateStudentProfileUseCaseTest {
 
     private final StudentRepository studentRepository = mock(StudentRepository.class);
+        private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final UpdateStudentProfileUseCase useCase =
-            new UpdateStudentProfileUseCase(studentRepository, new StudentProfileMapper());
+            new UpdateStudentProfileUseCase(studentRepository, new StudentProfileMapper(), passwordEncoder);
 
     @Test
     void updatesOnlyTheAuthenticatedStudentProfile() {
@@ -48,6 +50,19 @@ class UpdateStudentProfileUseCaseTest {
                         new EducatorDTO("Intruso", "222", "other@example.com", null)));
         verify(studentRepository).findById(7L);
         verifyNoMoreInteractions(studentRepository);
+    }
+
+    @Test
+    void updatesPasswordOnlyWhenProvided() {
+        Student student = student();
+        when(studentRepository.findById(7L)).thenReturn(Optional.of(student));
+        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passwordEncoder.encode("new-password")).thenReturn("encoded-password");
+
+        useCase.execute(7L, null, new EducatorDTO("Ana", "222", null, null, "new-password"));
+
+        assertEquals("encoded-password", student.getPassword());
+        verify(passwordEncoder).encode("new-password");
     }
 
     private Student student() {

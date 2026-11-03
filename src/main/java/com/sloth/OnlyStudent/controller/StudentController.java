@@ -28,7 +28,7 @@ public class StudentController {
         this.updateStudentProfileUseCase = updateStudentProfileUseCase;
     }
 
-    @GetMapping("/atualUser")
+    @GetMapping({"/profile", "/atualUser"})
     public ResponseEntity<StudentResponseDTO> getUser(@RequestParam(required = false) Long id,
             @AuthenticationPrincipal User authenticatedUser) {
         return getStudentProfileUseCase.execute(authenticatedUser.getId(), id)
@@ -36,7 +36,7 @@ public class StudentController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/updateProfile")
+    @PutMapping({"/profile", "/updateProfile"})
     public ResponseEntity<String> updateUserByEmail(@RequestParam(required = false) String login,
             @RequestBody EducatorDTO user, @AuthenticationPrincipal User authenticatedUser) {
         return updateStudentProfileUseCase.execute(authenticatedUser.getId(), login, user)
