@@ -20,7 +20,8 @@ import com.sloth.OnlyStudent.application.administrator.GetAdministratorUseCase;
 import com.sloth.OnlyStudent.application.administrator.ListAdministratorsUseCase;
 import com.sloth.OnlyStudent.application.administrator.UpdateAdministratorUseCase;
 import com.sloth.OnlyStudent.entities.DTO.AdministratorResponseDTO;
-import com.sloth.OnlyStudent.entities.DTO.RegisterDTO;
+import com.sloth.OnlyStudent.entities.DTO.AdministratorDTO;
+import com.sloth.OnlyStudent.entities.DTO.AdministratorUpdateDTO;
 
 import jakarta.validation.Valid;
 
@@ -61,13 +62,13 @@ public class AdministratorController {
     }
 
     @PostMapping
-    public AdministratorResponseDTO create(@Valid @RequestBody RegisterDTO administrator) {
+    public AdministratorResponseDTO create(@Valid @RequestBody AdministratorDTO administrator) {
         return createAdministratorUseCase.execute(administrator);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AdministratorResponseDTO> update(@PathVariable Long id,
-            @Valid @RequestBody RegisterDTO administratorDetails) {
+            @Valid @RequestBody AdministratorUpdateDTO administratorDetails) {
         return updateAdministratorUseCase.execute(id, administratorDetails)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

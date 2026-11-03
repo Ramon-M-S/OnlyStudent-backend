@@ -136,6 +136,28 @@ class AdminSupportTokenEndpointsIntegrationTest {
         }
     }
 
+        @Test
+        void unauthenticatedAdministratorRoutesAreRejected() throws Exception {
+                mockMvc.perform(get("/admin")).andExpect(status().isUnauthorized());
+                mockMvc.perform(post("/admin")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(adminRequest()))
+                                .andExpect(status().isUnauthorized());
+                mockMvc.perform(put("/admin/3")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(adminRequest()))
+                                .andExpect(status().isUnauthorized());
+                mockMvc.perform(delete("/admin/3")).andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void administratorCreateRequiresAllRequiredFields() throws Exception {
+                mockMvc.perform(post("/admin").with(as(UserRole.ADMIN))
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("{}"))
+                                .andExpect(status().isBadRequest());
+        }
+
     @Test
     void supportRemainsPublicAndValidatesInputWithoutChangingSuccessText() throws Exception {
         mockMvc.perform(post("/support/send")
