@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sloth.OnlyStudent.entities.Classroom;
 import com.sloth.OnlyStudent.entities.Student;
+import com.sloth.OnlyStudent.entities.Status;
 import com.sloth.OnlyStudent.entities.UserRole;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
 import com.sloth.OnlyStudent.repository.StudentRepository;
@@ -30,6 +31,9 @@ public class JoinClassroomUseCase {
         }
         Classroom classroom = classroomRepository.findByCodigo(classroomCode)
                 .orElseThrow(ClassroomNotFoundException::new);
+        if (classroom.getStatus() != Status.ATIVA) {
+            throw new ClassroomAccessDeniedException();
+        }
         Student student = studentRepository.findById(principalId)
                 .orElseThrow(StudentNotFoundException::new);
         classroom.matricular(student);

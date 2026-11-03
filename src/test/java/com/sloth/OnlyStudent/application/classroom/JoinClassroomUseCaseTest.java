@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
@@ -68,6 +69,17 @@ class JoinClassroomUseCaseTest {
         when(studentRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(StudentNotFoundException.class,
                 () -> useCase.execute(12L, 99L, UserRole.STUDENT));
+    }
+
+    @Test
+    void rejectsEnrollmentInInactiveClassroom() {
+        Classroom classroom = classroom();
+        classroom.setStatus(Status.BLOQUEADA);
+        when(classroomRepository.findByCodigo(12L)).thenReturn(Optional.of(classroom));
+
+        assertThrows(com.sloth.OnlyStudent.shared.errors.ClassroomAccessDeniedException.class,
+                () -> useCase.execute(12L, 7L, UserRole.STUDENT));
+        verifyNoInteractions(studentRepository);
     }
 
     private Classroom classroom() {

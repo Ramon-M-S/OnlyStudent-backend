@@ -31,6 +31,7 @@ import com.sloth.OnlyStudent.application.classroom.CreateClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.GetClassroomDetailsUseCase;
 import com.sloth.OnlyStudent.application.classroom.JoinClassroomUseCase;
 import com.sloth.OnlyStudent.application.classroom.UpdateClassroomUseCase;
+import com.sloth.OnlyStudent.application.classroom.UpdateClassroomStatusUseCase;
 import com.sloth.OnlyStudent.application.classroom.ScheduleClassroomDeletionUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListEducatorClassroomsUseCase;
 import com.sloth.OnlyStudent.application.classroom.ListStudentClassroomsUseCase;
@@ -78,6 +79,7 @@ public class ClassroomController {
     private final DeleteAvisoUseCase deleteAvisoUseCase;
     private final UpdateAvisoUseCase updateAvisoUseCase;
     private final UpdateClassroomUseCase updateClassroomUseCase;
+    private final UpdateClassroomStatusUseCase updateClassroomStatusUseCase;
     private final ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase;
     private final CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase;
 
@@ -97,6 +99,7 @@ public class ClassroomController {
             DeleteAvisoUseCase deleteAvisoUseCase,
             UpdateAvisoUseCase updateAvisoUseCase,
             UpdateClassroomUseCase updateClassroomUseCase,
+            UpdateClassroomStatusUseCase updateClassroomStatusUseCase,
             ScheduleClassroomDeletionUseCase scheduleClassroomDeletionUseCase,
             CancelClassroomDeletionUseCase cancelClassroomDeletionUseCase) {
         this.classroomRepository = classroomRepository;
@@ -113,6 +116,7 @@ public class ClassroomController {
         this.deleteAvisoUseCase = deleteAvisoUseCase;
         this.updateAvisoUseCase = updateAvisoUseCase;
         this.updateClassroomUseCase = updateClassroomUseCase;
+        this.updateClassroomStatusUseCase = updateClassroomStatusUseCase;
         this.scheduleClassroomDeletionUseCase = scheduleClassroomDeletionUseCase;
         this.cancelClassroomDeletionUseCase = cancelClassroomDeletionUseCase;
     }
@@ -132,6 +136,7 @@ public class ClassroomController {
         this(classroomRepository, materialRepository, classroomService, createClassroomUseCase, joinClassroomUseCase,
                 listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
                 searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, null, updateClassroomUseCase,
+                new UpdateClassroomStatusUseCase(classroomRepository),
                 new ScheduleClassroomDeletionUseCase(classroomRepository),
                 new CancelClassroomDeletionUseCase(classroomRepository));
     }
@@ -153,6 +158,7 @@ public class ClassroomController {
                 listStudentClassroomsUseCase, listEducatorClassroomsUseCase, getClassroomDetailsUseCase,
                 searchClassroomsUseCase, listMaterialsUseCase, createAvisoUseCase, null, updateAvisoUseCase,
                 updateClassroomUseCase,
+                new UpdateClassroomStatusUseCase(classroomRepository),
                 new ScheduleClassroomDeletionUseCase(classroomRepository),
                 new CancelClassroomDeletionUseCase(classroomRepository));
     }
@@ -276,6 +282,25 @@ public class ClassroomController {
                 .orElseThrow(ClassroomNotFoundException::new);
         requireEducatorOwner(classroom, principal);
         classroomService.updateStatus(id, body.status());
+    }
+
+    @PatchMapping("/{codigo}/status")
+    public ResponseEntity<ClassroomsDTO> updateClassroomStatus(@PathVariable Long codigo,
+            @RequestBody StatusDTO body,
+            @AuthenticationPrincipal User principal) {
+        Classroom updated = updateClassroomStatusUseCase.execute(codigo, body.status(), principal);
+        return ResponseEntity.ok(new ClassroomsDTO(
+                updated.getCodigo(),
+                updated.getName(),
+                updated.getEducator() == null ? null : updated.getEducator().getName(),
+                updated.getStatus(),
+                updated.getCusto(),
+                updated.getPrice(),
+                updated.getAlunos() == null ? 0 : updated.getAlunos().size(),
+                updated.getMaterials() == null ? 0 : updated.getMaterials().size(),
+                updated.getDataExclusaoAgendada(),
+                updated.getCoverImageUrl(),
+                updated.getProfileImageUrl()));
     }
 
     @PostMapping("/register")
