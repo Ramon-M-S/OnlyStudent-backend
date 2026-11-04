@@ -31,6 +31,11 @@ public class ScheduleClassroomDeletionUseCase {
                 .orElseThrow(ClassroomNotFoundException::new);
         requireOwner(classroom, principal);
 
+        if (classroom.getAlunos() == null || classroom.getAlunos().isEmpty()) {
+            classroomRepository.delete(classroom);
+            return classroom;
+        }
+
         if (classroom.getDataExclusaoAgendada() == null) {
             LocalDateTime deletionDate = LocalDateTime.now().plusDays(3);
             classroom.setDataExclusaoAgendada(deletionDate);

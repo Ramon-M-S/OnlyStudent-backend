@@ -33,6 +33,7 @@ public class CreateClassroomUseCase {
         Classroom classroom = Classroom.criar(request.name(), request.description(), educator, request.price());
         classroom.setCoverImageUrl(request.coverImageUrl());
         classroom.setProfileImageUrl(request.profileImageUrl());
+        classroom.setThemeColor(request.themeColor());
         return classroomRepository.save(classroom);
     }
 }

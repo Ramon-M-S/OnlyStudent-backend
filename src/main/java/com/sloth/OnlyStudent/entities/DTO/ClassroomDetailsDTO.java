@@ -15,7 +15,8 @@ public record ClassroomDetailsDTO(
     List<AvisoResponseDTO> avisos,
     LocalDateTime dataExclusaoAgendada,
     String coverImageUrl,
-    String profileImageUrl
+    String profileImageUrl,
+    String themeColor
 ) {
 
     public ClassroomDetailsDTO(Long codigo, String name, String description, String educator, Long idEducator,
@@ -27,6 +28,6 @@ public record ClassroomDetailsDTO(
             Set<MaterialResponseDTO> materiais, List<String> nomeAlunos, List<AvisoResponseDTO> avisos,
             LocalDateTime dataExclusaoAgendada) {
         this(codigo, name, description, educator, idEducator, materiais, nomeAlunos, avisos,
-                dataExclusaoAgendada, null, null);
+                dataExclusaoAgendada, null, null, null);
     }
 }

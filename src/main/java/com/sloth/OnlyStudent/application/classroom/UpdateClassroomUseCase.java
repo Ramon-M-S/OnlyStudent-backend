@@ -46,6 +46,7 @@ public class UpdateClassroomUseCase {
         classroom.setDescription(request.description());
         classroom.setCoverImageUrl(request.coverImageUrl());
         classroom.setProfileImageUrl(request.profileImageUrl());
+        classroom.setThemeColor(request.themeColor());
         return classroomRepository.save(classroom);
     }
 }

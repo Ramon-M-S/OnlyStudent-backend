@@ -7,7 +7,7 @@ import com.sloth.OnlyStudent.entities.Status;
 
 public record ClassroomsDTO(Long codigo, String name, String educator, Status status, Custo custo, double price,
         int totalAlunos, int totalMateriais, LocalDateTime dataExclusaoAgendada,
-        String coverImageUrl, String profileImageUrl) {
+        String coverImageUrl, String profileImageUrl, String themeColor) {
 
     public ClassroomsDTO(Long codigo, String name, String educator, Status status, Custo custo, double price,
             int totalAlunos, int totalMateriais) {
@@ -17,6 +17,6 @@ public record ClassroomsDTO(Long codigo, String name, String educator, Status st
     public ClassroomsDTO(Long codigo, String name, String educator, Status status, Custo custo, double price,
             int totalAlunos, int totalMateriais, LocalDateTime dataExclusaoAgendada) {
         this(codigo, name, educator, status, custo, price, totalAlunos, totalMateriais,
-                dataExclusaoAgendada, null, null);
+                dataExclusaoAgendada, null, null, null);
     }
 }

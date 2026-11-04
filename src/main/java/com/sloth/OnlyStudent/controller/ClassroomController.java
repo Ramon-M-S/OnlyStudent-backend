@@ -240,7 +240,8 @@ public class ClassroomController {
                                 aviso.getMensagem(),
                                 aviso.getDataCriacao()))
                         .toList(),
-                updated.getDataExclusaoAgendada(), updated.getCoverImageUrl(), updated.getProfileImageUrl()));
+                updated.getDataExclusaoAgendada(), updated.getCoverImageUrl(), updated.getProfileImageUrl(),
+                updated.getThemeColor()));
     }
 
     @DeleteMapping("/{codigo}")

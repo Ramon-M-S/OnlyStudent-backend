@@ -23,7 +23,8 @@ public class ClassroomResponseMapper {
                 classroom.getStatus(), classroom.getCusto(), classroom.getPrice(),
                 classroom.getAlunos() == null ? 0 : classroom.getAlunos().size(),
                 classroom.getMaterials() == null ? 0 : classroom.getMaterials().size(),
-                classroom.getDataExclusaoAgendada(), classroom.getCoverImageUrl(), classroom.getProfileImageUrl());
+                classroom.getDataExclusaoAgendada(), classroom.getCoverImageUrl(), classroom.getProfileImageUrl(),
+                classroom.getThemeColor());
     }
 
     public ClassroomDetailsDTO toDetails(Classroom classroom) {
@@ -39,7 +40,8 @@ public class ClassroomResponseMapper {
                 
         return new ClassroomDetailsDTO(classroom.getCodigo(), classroom.getName(), classroom.getDescription(),
                 classroom.getEducator().getName(), classroom.getEducator().getId(), materials, studentNames, avisos,
-                classroom.getDataExclusaoAgendada(), classroom.getCoverImageUrl(), classroom.getProfileImageUrl());
+                classroom.getDataExclusaoAgendada(), classroom.getCoverImageUrl(), classroom.getProfileImageUrl(),
+                classroom.getThemeColor());
     }
 
     private MaterialResponseDTO toMaterialResponse(Material material) {

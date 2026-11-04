@@ -48,7 +48,8 @@ public class ClassroomService {
                     classroom.getTotalMateriais(),
                     classroom.getDataExclusaoAgendada(),
                     classroom.getCoverImageUrl(),
-                    classroom.getProfileImageUrl()
+                    classroom.getProfileImageUrl(),
+                    classroom.getThemeColor()
             );
             dtoList.add(dto);
         }
@@ -72,7 +73,8 @@ public class ClassroomService {
                     classroom.getTotalMateriais(),
                     classroom.getDataExclusaoAgendada(),
                     classroom.getCoverImageUrl(),
-                    classroom.getProfileImageUrl()
+                    classroom.getProfileImageUrl(),
+                    classroom.getThemeColor()
             );
             dtoList.add(dto);
         }
@@ -95,7 +97,8 @@ public class ClassroomService {
                 classroom.getTotalMateriais(),
                 classroom.getDataExclusaoAgendada(),
                 classroom.getCoverImageUrl(),
-                classroom.getProfileImageUrl()
+                classroom.getProfileImageUrl(),
+                classroom.getThemeColor()
             ));
     }
     
@@ -114,7 +117,8 @@ public class ClassroomService {
                 classroom.getTotalMateriais(),
                 classroom.getDataExclusaoAgendada(),
                 classroom.getCoverImageUrl(),
-                classroom.getProfileImageUrl()
+                classroom.getProfileImageUrl(),
+                classroom.getThemeColor()
             ));
     }
 
@@ -155,7 +159,8 @@ public class ClassroomService {
 	            classroom.getTotalMateriais(),
 	            classroom.getDataExclusaoAgendada(),
 	            classroom.getCoverImageUrl(),
-	            classroom.getProfileImageUrl()
+	            classroom.getProfileImageUrl(),
+	            classroom.getThemeColor()
 	        ))
 	        .collect(Collectors.toList());
 
@@ -186,7 +191,8 @@ public class ClassroomService {
                 classroom.getTotalMateriais(),
                 classroom.getDataExclusaoAgendada(),
                 classroom.getCoverImageUrl(),
-                classroom.getProfileImageUrl()
+                classroom.getProfileImageUrl(),
+                classroom.getThemeColor()
             ));
     }
 	

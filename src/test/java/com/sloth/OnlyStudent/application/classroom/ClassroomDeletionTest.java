@@ -22,6 +22,7 @@ import com.sloth.OnlyStudent.entities.Classroom;
 import com.sloth.OnlyStudent.entities.Custo;
 import com.sloth.OnlyStudent.entities.Educator;
 import com.sloth.OnlyStudent.entities.Status;
+import com.sloth.OnlyStudent.entities.Student;
 import com.sloth.OnlyStudent.entities.User;
 import com.sloth.OnlyStudent.entities.UserRole;
 import com.sloth.OnlyStudent.repository.ClassroomRepository;
@@ -36,6 +37,7 @@ class ClassroomDeletionTest {
     @Test
     void schedulesDeletionAndPublishesNoticeForTheOwner() {
         Classroom classroom = classroom(12L);
+        classroom.getAlunos().add(new Student(8L, "Aluno", "123", "student@example.com", "hash", UserRole.STUDENT));
         User owner = user(3L);
         when(classroomRepository.findByCodigo(12L)).thenReturn(Optional.of(classroom));
         when(classroomRepository.save(classroom)).thenReturn(classroom);
@@ -47,6 +49,19 @@ class ClassroomDeletionTest {
         assertTrue(classroom.getDataExclusaoAgendada().isBefore(LocalDateTime.now().plusDays(4)));
         assertTrue(classroom.getAvisos().get(0).getMensagem().contains("será excluída permanentemente"));
         verify(classroomRepository).save(classroom);
+    }
+
+    @Test
+    void deletesClassroomImmediatelyWhenItHasNoStudents() {
+        Classroom classroom = classroom(12L);
+        User owner = user(3L);
+        when(classroomRepository.findByCodigo(12L)).thenReturn(Optional.of(classroom));
+
+        new ScheduleClassroomDeletionUseCase(classroomRepository).execute(12L, owner);
+
+        assertNull(classroom.getDataExclusaoAgendada());
+        assertTrue(classroom.getAvisos().isEmpty());
+        verify(classroomRepository).delete(classroom);
     }
 
     @Test

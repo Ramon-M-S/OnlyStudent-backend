@@ -56,6 +56,9 @@ public class Classroom {
 	@Column(length = 2048)
 	private String profileImageUrl;
 
+	@Column(length = 50)
+	private String themeColor;
+
 	private LocalDateTime dataExclusaoAgendada;
 	
 	@ManyToMany
@@ -136,6 +139,10 @@ public class Classroom {
 		return profileImageUrl;
 	}
 
+	public String getThemeColor() {
+		return themeColor;
+	}
+
 	public LocalDateTime getDataExclusaoAgendada() {
 		return dataExclusaoAgendada;
 	}
@@ -190,6 +197,10 @@ public class Classroom {
 
 	public void setProfileImageUrl(String profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
+	}
+
+	public void setThemeColor(String themeColor) {
+		this.themeColor = themeColor;
 	}
 
 	public void setDataExclusaoAgendada(LocalDateTime dataExclusaoAgendada) {

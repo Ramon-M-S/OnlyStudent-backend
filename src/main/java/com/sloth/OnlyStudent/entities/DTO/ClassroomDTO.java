@@ -13,9 +13,11 @@ public record ClassroomDTO(
         @PositiveOrZero(message = "O preço da turma não pode ser negativo.")
         double price,
         String coverImageUrl,
-        String profileImageUrl) {
+        String profileImageUrl,
+        @Size(max = 50, message = "A cor da turma deve ter no máximo 50 caracteres.")
+        String themeColor) {
 
     public ClassroomDTO(String name, String description, Long idEducator, double price) {
-        this(name, description, idEducator, price, null, null);
+        this(name, description, idEducator, price, null, null, null);
     }
 }
