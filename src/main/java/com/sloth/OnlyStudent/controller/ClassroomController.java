@@ -301,7 +301,8 @@ public class ClassroomController {
                 updated.getMaterials() == null ? 0 : updated.getMaterials().size(),
                 updated.getDataExclusaoAgendada(),
                 updated.getCoverImageUrl(),
-                updated.getProfileImageUrl()));
+                updated.getProfileImageUrl(),
+                updated.getThemeColor()));
     }
 
     @PostMapping("/register")
