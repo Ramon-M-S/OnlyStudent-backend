@@ -1,1 +1,1 @@
-CREATE DATABASE "school-test";
+CREATE DATABASE "onlystudent-test";
